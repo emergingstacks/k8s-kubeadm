@@ -1,0 +1,14 @@
+---
+- hosts: all
+  user: "{{ remote_user }}"
+  become: yes
+  become_user: root
+  roles:
+     - ../roles/generic
+
+- hosts: haproxy
+  user: "{{ remote_user }}"
+  become: yes
+  become_user: root
+  roles:
+     - ../roles/haproxy

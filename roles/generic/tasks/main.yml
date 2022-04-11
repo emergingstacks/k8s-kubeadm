@@ -1,0 +1,6 @@
+---
+# tasks file for haproxy
+- name: copy hosts file
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
