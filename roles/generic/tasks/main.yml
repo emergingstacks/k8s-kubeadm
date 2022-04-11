@@ -4,3 +4,13 @@
   template:
     src: hosts.j2
     dest: /etc/hosts
+
+- name: Disable UFW
+  community.general.ufw:
+    state: disabled
+
+- name: Disable swap
+  command: swapoff -a
+  
+- name: permanantly disable swap
+  command:  sed -i '/swap/d' /etc/fstab

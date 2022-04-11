@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: k8s-master, k8s-nodes
   user: "{{ remote_user }}"
   become: yes
   become_user: root
