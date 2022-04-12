@@ -1,10 +1,4 @@
 ---
-#- hosts: k8s-master-primary, k8s-master-replicas k8s-nodes
-#  user: "{{ remote_user }}"
-#  become: yes
-#  become_user: root
-#  roles:
-#     - ../roles/generic
 #- hosts: haproxy
 #  user: "{{ remote_user }}"
 #  become: yes
@@ -12,12 +6,19 @@
 #  roles:
 #     - ../roles/haproxy
 
-- hosts: k8s-master-primary
-  user: "{{ remote_user }}"
-  become: yes
-  become_user: root
-  roles:
-     - ../roles/bootstrap
+#- hosts: k8s-master-primary,k8s-master-replicas,k8s-nodes
+#  user: "{{ remote_user }}"
+#  become: yes
+#  become_user: root
+#  roles:
+#     - ../roles/generic
+
+#- hosts: k8s-master-primary
+#  user: "{{ remote_user }}"
+#  become: yes
+#  become_user: root
+#  roles:
+#     - ../roles/bootstrap
 
 - hosts: k8s-master-replicas
   user: "{{ remote_user }}"
