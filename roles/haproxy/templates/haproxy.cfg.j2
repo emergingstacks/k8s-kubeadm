@@ -8,6 +8,9 @@ backend kubernetes-backend
     mode tcp
     option tcp-check
     balance roundrobin
-{% for item in groups['k8s-master'] %}
+{% for item in groups['k8s-master-primary'] %}
+    server {{item}} {{ hostvars[item].ansible_host }}:6443 check fall 3 rise 2
+{% endfor %}
+{% for item in groups['k8s-master-replicas'] %}
     server {{item}} {{ hostvars[item].ansible_host }}:6443 check fall 3 rise 2
 {% endfor %}

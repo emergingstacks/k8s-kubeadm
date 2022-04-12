@@ -1,5 +1,8 @@
 ---
 # tasks file for haproxy
+#- name: reset
+#  shell: kubeadm reset --force
+
 - name: "Create kubernetes folders"
   file:
     path: /etc/kubernetes/pki/etcd
@@ -23,6 +26,7 @@
 
 - set_fact:
     kubeadm_join: "{{ kubeadm_join_cmd.stdout }}"
+
 
 - name: Join Master replicas to cluster
   shell: "{{ kubeadm_join }} --control-plane --apiserver-advertise-address={{ hostvars[inventory_hostname]['ansible_host'] }} --ignore-preflight-errors=NumCPU"
