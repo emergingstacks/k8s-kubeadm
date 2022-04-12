@@ -1,1 +1,9 @@
-remote_user: harshal
+remote_user: root
+docker_ce_daemon_options:
+    exec-opts: [ "native.cgroupdriver=systemd" ]
+    log-driver: json-file
+    log-opts:
+        max-size: "100m"
+        max-file: "7"
+    storage-driver: overlay2
+    storage-opts: [ "overlay2.override_kernel_check=true" ]

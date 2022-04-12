@@ -1,5 +1,9 @@
 ---
 # tasks file for haproxy
+- name: Set a hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
 - name: copy hosts file
   template:
     src: hosts.j2
@@ -14,3 +18,65 @@
   
 - name: permanantly disable swap
   command:  sed -i '/swap/d' /etc/fstab
+
+- name: Update sysctl settings for Kubernetes networking
+  shell: |
+   cat >>/etc/sysctl.d/kubernetes.conf<<EOF
+   net.bridge.bridge-nf-call-ip6tables = 1
+   net.bridge.bridge-nf-call-iptables = 1
+   EOF
+   sysctl --system
+ 
+- name: install docker engine pre-requisites
+  apt:
+   pkg:
+    - apt-transport-https 
+    - ca-certificates 
+    - curl 
+    - gnupg-agent 
+    - software-properties-common
+   state: latest
+   update_cache: true
+
+- name: Add an Apt signing key, uses whichever key is at the URL
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add specified repository into sources list
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+    state: present
+
+- name: install docker
+  apt:
+   pkg:
+    - docker.io
+   state: present
+   update_cache: true
+
+- name: Configure additional engine options
+  copy:
+    content: "{{ docker_ce_daemon_options | to_nice_json }}"
+    dest: /etc/docker/daemon.json
+    mode: 0644
+  when: docker_ce_daemon_options is defined
+
+- name: Add k8s apt repo key
+  ansible.builtin.apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+
+- name: Add specified k8s repository into sources list
+  ansible.builtin.apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+
+- name: install kubeadm, kubectl, kubelet
+  apt:
+   pkg:
+    - kubeadm=1.22.0-00 
+    - kubelet=1.22.0-00
+    - kubectl=1.22.0-00
+   update_cache: true

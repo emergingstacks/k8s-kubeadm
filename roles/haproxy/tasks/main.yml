@@ -1,5 +1,9 @@
 ---
 # tasks file for haproxy
+- name: Set a hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
 - name: copy hosts file
   template:
     src: hosts.j2
@@ -14,7 +18,7 @@
 - name: Copy haproxy config file
   template:
     src: haproxy.cfg.j2
-    dest: /etc/haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
 
 - name: haproxy restart
   ansible.builtin.service:

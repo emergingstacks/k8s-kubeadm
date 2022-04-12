@@ -1,0 +1,54 @@
+---
+# tasks file for haproxy
+- name: kubeadm init on master-1
+  command: kubeadm init --control-plane-endpoint=k8s-haproxy:6443 --upload-certs --apiserver-advertise-address={{ hostvars[inventory_hostname]['ansible_host'] }} --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=NumCPU
+  ignore_errors: true
+- pause:
+    prompt: "Validate kubeadm init"
+
+- name: Create .kube folder
+  file:
+    path: "/root/.kube"
+    state: directory
+    owner: "root"
+
+- name: Copy admin.conf to .kube folder
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "/root/.kube/config"
+    owner: "root"
+    remote_src: yes
+
+- name: Deploy CNI
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.15/manifests/calico.yaml
+  ignore_errors: true
+
+- name: "Fetching Kubernetes Master PKI files from primary master"
+  fetch:
+    src: /etc/kubernetes/pki/{{item}}
+    dest: /tmp/kubeadm-ha/pki/{{item}}
+    flat: yes
+  with_items:
+    - ca.crt
+    - ca.key
+    - sa.key
+    - sa.pub
+    - front-proxy-ca.crt 
+    - front-proxy-ca.key
+
+- name: "Fetching Kubernetes Master ETCD files from primary master"
+  fetch:
+    src: /etc/kubernetes/pki/etcd/{{item}}
+    dest: /tmp/kubeadm-ha/pki/etcd/{{item}}
+    flat: yes
+  with_items:
+    - ca.crt
+    - ca.key
+
+- name: "Fetching Kubernetes Master Admin files from primary master"
+  fetch:
+    src: /etc/kubernetes/{{item}}
+    dest: /tmp/kubeadm-ha/{{item}}
+    flat: yes
+  with_items:
+    - admin.conf 
