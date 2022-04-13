@@ -20,9 +20,16 @@
 #  roles:
 #     - ../roles/bootstrap
 
-- hosts: k8s-master-replicas
+#- hosts: k8s-master-replicas
+#  user: "{{ remote_user }}"
+#  become: yes
+#  become_user: root
+#  roles:
+#     - ../roles/join-master
+
+- hosts: k8s-nodes
   user: "{{ remote_user }}"
   become: yes
   become_user: root
   roles:
-     - ../roles/join-master
+     - ../roles/join-worker

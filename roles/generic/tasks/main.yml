@@ -80,3 +80,18 @@
     - kubelet=1.21.0-00
     - kubectl=1.21.0-00
    update_cache: true
+
+- name: Restart docker service
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker
+    enabled: yes
+
+
+- name: Restart kubelet service
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: kubelet
+    enabled: yes
