@@ -1,0 +1,40 @@
+---
+# tasks file for haproxy
+- name: Install keepalived
+  apt:
+   name: keepalived
+   state: present
+   update_cache: yes
+
+- ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- ansible.posix.sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: copy keepalived file on {{groups['haproxy'][0]}}
+  template:
+    src: keepalived.conf_1.j2
+    dest: /etc/keepalived/keepalived.conf
+  delegate_to: "{{groups['haproxy'][0]}}"
+
+- name: copy keepalived file on {{groups['haproxy'][1]}}
+  template:
+    src: keepalived.conf_2.j2
+    dest: /etc/keepalived/keepalived.conf
+  delegate_to: "{{groups['haproxy'][1]}}"
+
+
+- name: keepalived restart
+  ansible.builtin.service:
+    name: keepalived
+    state: restarted
+    enabled: true

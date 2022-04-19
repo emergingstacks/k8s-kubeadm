@@ -7,3 +7,5 @@ docker_ce_daemon_options:
         max-file: "7"
     storage-driver: overlay2
     storage-opts: [ "overlay2.override_kernel_check=true" ]
+vip: 172.16.16.60
+keepalived_interface: eth1

@@ -11,4 +11,5 @@ k8s-node-1 ansible_host=172.16.16.201
 
 
 [haproxy]
-k8s-haproxy ansible_host=172.16.16.100
+k8s-haproxy-1 ansible_host=172.16.16.51
+k8s-haproxy-2 ansible_host=172.16.16.52
