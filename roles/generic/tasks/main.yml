@@ -19,13 +19,38 @@
 - name: permanantly disable swap
   command:  sed -i '/swap/d' /etc/fstab
 
+- name: Create /etc/sysctl.d/kubernetes.conf
+  ansible.builtin.file:
+    path: /etc/sysctl.d/kubernetes.conf
+    state: touch
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Check for line net.bridge.bridge-nf-call-ip6tables
+  shell: grep -c "^net.bridge.bridge-nf-call-ip6tables" /etc/sysctl.d/kubernetes.conf || true
+  register: check_ip6tables
+
+- name: Define net.bridge.bridge-nf-call-ip6tables if undefined
+  lineinfile:
+    state: present
+    path: "/etc/sysctl.d/kubernetes.conf"
+    line: "net.bridge.bridge-nf-call-ip6tables = 1"
+  when: check_ip6tables.stdout == "0"
+ 
+- name: Check for line net.bridge.bridge-nf-call-iptables
+  shell: grep -c "^net.bridge.bridge-nf-call-iptables" /etc/sysctl.d/kubernetes.conf || true
+  register: check_iptables
+
+- name: Define net.bridge.bridge-nf-call-iptables if undefined
+  lineinfile:
+    state: present
+    path: "/etc/sysctl.d/kubernetes.conf"
+    line: "net.bridge.bridge-nf-call-iptables = 1"
+  when: check_iptables.stdout == "0"
+
 - name: Update sysctl settings for Kubernetes networking
-  shell: |
-   cat >>/etc/sysctl.d/kubernetes.conf<<EOF
-   net.bridge.bridge-nf-call-ip6tables = 1
-   net.bridge.bridge-nf-call-iptables = 1
-   EOF
-   sysctl --system
+  command: sysctl --system
  
 - name: install docker engine pre-requisites
   apt:
@@ -79,6 +104,16 @@
     - kubeadm=1.21.0-00 
     - kubelet=1.21.0-00
     - kubectl=1.21.0-00
+   update_cache: true
+
+- name: install ipvsadm ipset xfsprogs lvm2 dmsetup
+  apt:
+   pkg:
+    - ipvsadm 
+    - ipset 
+    - xfsprogs 
+    - lvm2 
+    - dmsetup
    update_cache: true
 
 - name: Restart docker service

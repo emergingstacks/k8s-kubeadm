@@ -27,6 +27,7 @@
   become_user: root
   roles:
      - ../roles/join-master
+
 - hosts: k8s-nodes
   user: "{{ remote_user }}"
   become: yes

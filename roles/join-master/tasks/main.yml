@@ -29,4 +29,4 @@
 
 
 - name: Join Master replicas to cluster
-  shell: "{{ kubeadm_join }} --control-plane --apiserver-advertise-address={{ hostvars[inventory_hostname]['ansible_host'] }} --ignore-preflight-errors=NumCPU"
+  shell: "{{ kubeadm_join }} --control-plane --apiserver-advertise-address={{ hostvars[inventory_hostname]['ansible_host'] }} --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem"

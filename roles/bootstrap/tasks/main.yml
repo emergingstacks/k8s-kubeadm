@@ -1,7 +1,7 @@
 ---
 # tasks file for haproxy
 - name: kubeadm init on master-1
-  command: kubeadm init --control-plane-endpoint={{ vip }}:6443 --upload-certs --apiserver-advertise-address={{ hostvars[inventory_hostname]['ansible_host'] }} --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=NumCPU
+  command: kubeadm init --control-plane-endpoint={{ vip }}:6443 --upload-certs --apiserver-advertise-address={{ hostvars[inventory_hostname]['ansible_host'] }} --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem
   #  ignore_errors: true
 - pause:
     prompt: "Validate kubeadm init"
@@ -20,7 +20,7 @@
     remote_src: yes
 
 - name: Deploy CNI
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.15/manifests/calico.yaml
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
   #ignore_errors: true
 
 - name: "Fetching Kubernetes Master PKI files from primary master"
